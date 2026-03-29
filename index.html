@@ -20,293 +20,305 @@
       --success: #22c55e;
     }
 
+    /* --- EFFET FLASH DE TRANSITION --- */
+    #warp-flash {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: white; opacity: 0; pointer-events: none; z-index: 10000;
+      transition: opacity 0.3s ease-out;
+    }
+
+    /* --- STYLES HYPER MODE (BLEU & BLANC) --- */
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
       background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
                   url('https://i.imgur.com/Rsv7lQi.png');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: var(--text-main); 
-      margin: 0; 
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-size: cover; background-position: center; background-attachment: fixed;
+      color: var(--text-main); margin: 0; padding: 0;
+      min-height: 100vh; display: flex; justify-content: center; align-items: center;
       overflow-x: hidden;
+      transition: background-size 1.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* CONTENEUR DES PLANÈTES EN FOND */
+    body.hyper-mode {
+      animation: hyper-warp 0.4s linear infinite;
+      background-size: 200% 200%;
+    }
+
+    @keyframes hyper-warp {
+      0% { background-position: 50% 50%; }
+      100% { background-position: 50% 250%; }
+    }
+
+    /* TEXTE EN DEGRADE BLEU / BLEU */
+    .hyper-mode h1 {
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #0ea5e9, #38bdf8);
+      background-size: 300%;
+      animation: blue-scroll 2s linear infinite;
+      -webkit-background-clip: text;
+    }
+
+    @keyframes blue-scroll { to { background-position: 300%; } }
+
+    .hyper-mode .logo {
+      animation: float 0.2s infinite, rotate-fast 0.4s linear infinite !important;
+      border-color: #fff;
+      box-shadow: 0 0 50px var(--accent);
+    }
+
+    @keyframes rotate-fast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* CANVAS DES ÉTINCELLES */
+    #explosion-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 999;
+    }
+
     #space-container {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: hidden;
     }
+    .planet { position: absolute; will-change: transform; }
 
-    .planet {
-      position: absolute;
-      will-change: transform;
-    }
-
-    /* PARTICULES */
     .particles {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
       background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-      background-size: 50px 50px;
-      opacity: 0.3;
+      background-size: 50px 50px; opacity: 0.3;
     }
 
     .container {
-      width: 100%;
-      max-width: 500px;
-      padding: 40px 20px;
-      text-align: center;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 10;
+      width: 100%; max-width: 500px; padding: 40px 20px;
+      text-align: center; box-sizing: border-box; position: relative; z-index: 10;
     }
 
     /* HEADER & LOGO */
-    .header-section {
-      margin-bottom: 40px;
-      animation: fadeInDown 0.8s ease backwards;
-    }
-
+    .header-section { margin-bottom: 40px; animation: fadeInDown 0.8s ease backwards; }
+    
     .logo-container {
-      position: relative;
-      display: inline-block;
-      margin-bottom: 20px;
+      position: relative; display: inline-block; margin-bottom: 20px;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
 
     .logo {
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
-      animation: float 4s ease-in-out infinite;
-      position: relative;
-      z-index: 2;
+      width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
+      border: 3px solid var(--accent); box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+      animation: float 4s ease-in-out infinite; position: relative; z-index: 2;
+      transition: border-color 1s, box-shadow 1s, transform 0.5s;
     }
 
     .logo-glow {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      width: 140px; height: 140px; border-radius: 50%;
       background: linear-gradient(45deg, var(--accent), var(--accent-hover));
-      filter: blur(20px);
-      opacity: 0.5;
-      animation: pulseGlow 3s infinite alternate;
-      z-index: 1;
+      filter: blur(20px); opacity: 0.5; animation: pulseGlow 3s infinite alternate; z-index: 1;
     }
 
     h1 { 
-      font-weight: 800; 
-      font-size: 2.5rem; 
-      margin: 0;
-      letter-spacing: -1px;
+      font-weight: 800; font-size: 2.5rem; margin: 0; letter-spacing: -1px;
       background: linear-gradient(to right, #38bdf8, #818cf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.2;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2;
     }
 
-    .bio { 
-      color: var(--text-dim); 
-      font-size: 1.1rem; 
-      font-weight: 600;
-      margin-top: 5px;
-      letter-spacing: 1px;
-    }
+    .bio { color: var(--text-dim); font-size: 1.1rem; font-weight: 600; margin-top: 5px; letter-spacing: 1px; }
 
-    /* CONTENEUR DES LIENS */
-    .links-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    /* STYLE DES BOUTONS */
+    /* LIENS */
+    .links-wrapper { display: flex; flex-direction: column; gap: 15px; }
     .link-btn {
-      display: flex;
-      align-items: center;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px 25px;
-      text-decoration: none;
-      color: var(--text-main);
-      font-size: 1.1rem;
-      font-weight: 600;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-      animation: slideUp 0.6s ease backwards;
+      display: flex; align-items: center; background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 18px 25px; text-decoration: none; color: var(--text-main);
+      font-size: 1.1rem; font-weight: 600; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative;
+      overflow: hidden; cursor: pointer; animation: slideUp 0.6s ease backwards;
     }
-
-    .link-btn span {
-      flex-grow: 1;
-      text-align: center;
-      z-index: 2;
-    }
-
-    .icon {
-      width: 24px;
-      height: 24px;
-      fill: currentColor;
-      z-index: 2;
-      transition: transform 0.3s ease;
-    }
+    .link-btn span { flex-grow: 1; text-align: center; z-index: 2; }
+    .icon { width: 24px; height: 24px; fill: currentColor; z-index: 2; transition: transform 0.3s ease; }
 
     .link-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 50%;
-      height: 100%;
+      content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
       background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-      transform: skewX(-20deg);
-      transition: left 0.5s ease;
-      z-index: 1;
+      transform: skewX(-20deg); transition: left 0.5s ease; z-index: 1;
     }
-
     .link-btn:hover {
-      transform: translateY(-5px) scale(1.02);
-      border-color: var(--accent);
-      background: rgba(30, 41, 59, 0.8);
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
-      color: var(--text-main);
+      transform: translateY(-5px) scale(1.02); border-color: var(--accent);
+      background: rgba(30, 41, 59, 0.8); box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
     }
+    .link-btn:hover .icon { transform: scale(1.2) rotate(5deg); color: var(--accent); }
+    .link-btn:hover::before { left: 200%; }
 
-    .link-btn:hover .icon {
-      transform: scale(1.2) rotate(5deg);
-      color: var(--accent);
-    }
-
-    .link-btn:hover::before {
-      left: 200%;
-    }
-
-    /* NOTIFICATION TOAST */
     #toast {
-      visibility: hidden;
-      min-width: 250px;
-      background-color: var(--success);
-      color: white;
-      text-align: center;
-      border-radius: 12px;
-      padding: 16px;
-      position: fixed;
-      z-index: 1000;
-      left: 50%;
-      bottom: 20px;
-      transform: translateX(-50%);
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.3s, bottom 0.3s;
-      box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+      visibility: hidden; min-width: 250px; background-color: var(--success); color: white;
+      text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000;
+      left: 50%; bottom: 20px; transform: translateX(-50%); font-weight: 600; opacity: 0;
+      transition: 0.3s; box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
     }
-
-    #toast.show {
-      visibility: visible;
-      opacity: 1;
-      bottom: 40px;
-    }
+    #toast.show { visibility: visible; opacity: 1; bottom: 40px; }
 
     .links-wrapper a, .links-wrapper div { animation-delay: calc(var(--i) * 0.1s); }
 
-    @keyframes slideUp { 
-      from { opacity: 0; transform: translateY(30px); } 
-      to { opacity: 1; transform: translateY(0); } 
+    @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes pulseGlow { from { opacity: 0.4; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); } }
+    @keyframes shake-hard {
+      0% { transform: translate(0,0); }
+      25% { transform: translate(3px, -3px); }
+      50% { transform: translate(-3px, 3px); }
+      100% { transform: translate(0,0); }
     }
-    @keyframes fadeInDown { 
-      from { opacity: 0; transform: translateY(-30px); } 
-      to { opacity: 1; transform: translateY(0); } 
-    }
-    @keyframes float { 
-      0%, 100% { transform: translateY(0); } 
-      50% { transform: translateY(-10px); } 
-    }
-    @keyframes pulseGlow { 
-      from { opacity: 0.4; transform: translate(-50%, -50%) scale(0.9); } 
-      to { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); } 
-    }
+    .shaking { animation: shake-hard 0.1s linear infinite !important; }
   </style>
 </head>
 <body>
 
+  <div id="warp-flash"></div>
+  <canvas id="explosion-canvas"></canvas>
   <div id="space-container"></div>
   <div class="particles"></div>
 
   <div class="container">
     <div class="header-section">
-      <div class="logo-container">
+      <div class="logo-container" onclick="handleLogoClick(event)">
         <div class="logo-glow"></div>
-        <img src="https://i.imgur.com/y8CfXfB.png" alt="PlutonH Logo" class="logo">
+        <img src="https://i.imgur.com/y8CfXfB.png" alt="PlutonH Logo" class="logo" id="main-logo">
       </div>
       <h1>PLUTONH</h1>
       <div class="bio">Streamer & Créateur de contenu</div>
     </div>
 
     <div class="links-wrapper">
-      
       <a href="https://www.twitch.tv/plutonh" class="link-btn" target="_blank" style="--i:1;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
         <span>Twitch</span>
       </a>
-
       <a href="https://www.youtube.com/@plutonh.twitch" class="link-btn" target="_blank" style="--i:2;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
         <span>YouTube</span>
       </a>
-
       <a href="https://www.tiktok.com/@plutonh.twitch" class="link-btn" target="_blank" style="--i:3;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
         <span>TikTok</span>
       </a>
-
       <a href="https://discord.gg/wD9Z85fAQA" class="link-btn" target="_blank" style="--i:4;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
         <span>Discord</span>
       </a>
-
       <div class="link-btn" onclick="copyEmail()" style="--i:5;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
         <span>Contact</span>
       </div>
-
     </div>
   </div>
 
   <div id="toast">✅ Adresse email copiée !</div>
 
   <script>
-    // --- FONCTION COPIER L'EMAIL ---
-    function copyEmail() {
-      const email = "plutonh@proton.me";
-      navigator.clipboard.writeText(email).then(() => {
-        const toast = document.getElementById("toast");
-        toast.className = "show";
-        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
-      });
+    // --- CANVAS SUPERNOVA ---
+    const canvas = document.getElementById('explosion-canvas');
+    const ctx = canvas.getContext('2d');
+    const flash = document.getElementById('warp-flash');
+    let sparks = [];
+    let clickCount = 0;
+    let clickTimer;
+    let isHyperMode = false;
+
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Spark {
+      constructor(x, y, color) {
+        this.x = x; this.y = y;
+        this.angle = Math.random() * Math.PI * 2;
+        this.velocity = Math.random() * (isHyperMode ? 25 : 15) + 5;
+        this.vx = Math.cos(this.angle) * this.velocity;
+        this.vy = Math.sin(this.angle) * this.velocity;
+        // CHANGEMENT : Particules blanches en hyper mode
+        this.color = color || (isHyperMode ? "#ffffff" : ['#38bdf8', '#818cf8', '#ffffff'][Math.floor(Math.random() * 3)]);
+        this.alpha = 1;
+        this.decay = Math.random() * 0.02 + 0.015;
+      }
+      draw() {
+        ctx.save(); ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(this.x - this.vx * 2, this.y - this.vy * 2);
+        ctx.strokeStyle = this.color; ctx.lineWidth = isHyperMode ? 4 : 2;
+        ctx.globalAlpha = this.alpha; ctx.stroke(); ctx.restore();
+      }
+      update() { this.x += this.vx; this.y += this.vy; this.vx *= 0.95; this.vy *= 0.95; this.alpha -= this.decay; }
     }
 
-    // --- SYSTEME ORGANIQUE DE PLANETES (Une seule à la fois) ---
+    function handleLogoClick(e) {
+      clickCount++;
+      clearTimeout(clickTimer);
+      
+      const rect = document.getElementById('main-logo').getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+
+      for (let i = 0; i < (isHyperMode ? 40 : 25); i++) sparks.push(new Spark(x, y));
+
+      if (clickCount >= 10 && !isHyperMode) {
+        activateHyperMode();
+      } else if (clickCount >= 5 && !isHyperMode) {
+        document.getElementById('main-logo').parentElement.classList.add('shaking');
+      }
+
+      clickTimer = setTimeout(() => {
+        clickCount = 0;
+        document.getElementById('main-logo').parentElement.classList.remove('shaking');
+      }, 2000);
+
+      if (sparks.length > 0) requestAnimationFrame(animateSparks);
+    }
+
+    function activateHyperMode() {
+      isHyperMode = true;
+      document.body.classList.add('hyper-mode');
+      
+      setTimeout(() => {
+        flash.style.opacity = "1";
+        setTimeout(() => {
+          isHyperMode = false;
+          document.body.classList.remove('hyper-mode');
+          clickCount = 0;
+          flash.style.opacity = "0";
+        }, 300);
+      }, 10000);
+    }
+
+    function animateSparks() {
+      if (sparks.length === 0 && !isHyperMode) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.globalCompositeOperation = 'lighter';
+
+      if (isHyperMode) {
+        // En hyper mode, on génère quelques étincelles blanches en continu
+        sparks.push(new Spark(Math.random() * canvas.width, Math.random() * canvas.height));
+      }
+
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        sparks[i].update();
+        sparks[i].draw();
+        if (sparks[i].alpha <= 0) sparks.splice(i, 1);
+      }
+      requestAnimationFrame(animateSparks);
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.className = "show";
+      setTimeout(() => toast.className = "", 3000);
+    }
+
+    function copyEmail() {
+      navigator.clipboard.writeText("plutonh@proton.me").then(() => showToast("✅ Email copié !"));
+    }
+
+    // --- SYSTEME DE PLANETES ---
     const planetUrls = [
       "https://i.imgur.com/evumoOa.png", "https://i.imgur.com/mtCNLpb.png", 
       "https://i.imgur.com/eYdIGQl.png", "https://i.imgur.com/VBW0rG5.png", 
@@ -317,89 +329,45 @@
 
     const container = document.getElementById("space-container");
     const planets = [];
-    const MAX_PLANETS = 1; // Toujours seule
+    const MAX_PLANETS = 1;
 
     function spawnPlanetOffscreen(p) {
       p.el.src = planetUrls[Math.floor(Math.random() * planetUrls.length)];
-      
       const size = Math.floor(Math.random() * (112 - 40 + 1)) + 40; 
-      p.size = size;
-      p.el.style.width = size + "px";
-      p.el.style.height = size + "px";
-      p.el.style.display = "block";
-      p.active = true;
+      p.size = size; p.el.style.width = size + "px"; p.el.style.height = size + "px";
+      p.el.style.display = "block"; p.active = true;
 
       const edge = Math.floor(Math.random() * 4);
-      
-      if (edge === 0) { // Haut
-        p.x = Math.random() * window.innerWidth;
-        p.y = -size - 20;
-        p.dx = (Math.random() - 0.5) * 1.5;
-        p.dy = Math.random() * 0.8 + 0.3;
-      } else if (edge === 1) { // Droite
-        p.x = window.innerWidth + size + 20;
-        p.y = Math.random() * window.innerHeight;
-        p.dx = -(Math.random() * 0.8 + 0.3);
-        p.dy = (Math.random() - 0.5) * 1.5;
-      } else if (edge === 2) { // Bas
-        p.x = Math.random() * window.innerWidth;
-        p.y = window.innerHeight + size + 20;
-        p.dx = (Math.random() - 0.5) * 1.5;
-        p.dy = -(Math.random() * 0.8 + 0.3);
-      } else { // Gauche
-        p.x = -size - 20;
-        p.y = Math.random() * window.innerHeight;
-        p.dx = Math.random() * 0.8 + 0.3;
-        p.dy = (Math.random() - 0.5) * 1.5;
-      }
-      p.rotation = Math.random() * 360;
-      p.dr = (Math.random() - 0.5) * 1.5;
+      if (edge === 0) { p.x = Math.random() * window.innerWidth; p.y = -size - 20; p.dx = (Math.random() - 0.5) * 1.5; p.dy = Math.random() * 0.8 + 0.3; }
+      else if (edge === 1) { p.x = window.innerWidth + size + 20; p.y = Math.random() * window.innerHeight; p.dx = -(Math.random() * 0.8 + 0.3); p.dy = (Math.random() - 0.5) * 1.5; }
+      else if (edge === 2) { p.x = Math.random() * window.innerWidth; p.y = window.innerHeight + size + 20; p.dx = (Math.random() - 0.5) * 1.5; p.dy = -(Math.random() * 0.8 + 0.3); }
+      else { p.x = -size - 20; p.y = Math.random() * window.innerHeight; p.dx = Math.random() * 0.8 + 0.3; p.dy = (Math.random() - 0.5) * 1.5; }
+      p.rotation = Math.random() * 360; p.dr = (Math.random() - 0.5) * 1.5;
     }
 
     for (let i = 0; i < MAX_PLANETS; i++) {
       const img = document.createElement("img");
-      img.className = "planet";
-      img.style.display = "none";
+      img.className = "planet"; img.style.display = "none";
       container.appendChild(img);
-      
       const p = { el: img, active: false };
       planets.push(p);
-
-      const initialDelay = Math.random() * 4000 + 1000;
-      setTimeout(() => spawnPlanetOffscreen(p), initialDelay);
+      setTimeout(() => spawnPlanetOffscreen(p), Math.random() * 4000 + 1000);
     }
 
     function animatePlanets() {
       planets.forEach(p => {
         if (!p.active) return;
-
-        p.x += p.dx;
-        p.y += p.dy;
-        p.rotation += p.dr;
-
+        p.x += p.dx; p.y += p.dy; p.rotation += p.dr;
         const margin = p.size + 100;
-        let isOutOfBounds = (
-          p.x > window.innerWidth + margin || 
-          p.x < -margin || 
-          p.y > window.innerHeight + margin || 
-          p.y < -margin
-        );
-
-        if (isOutOfBounds) {
-          p.active = false;
-          p.el.style.display = "none";
-          
-          // Délai aléatoire entre 4 et 12 secondes avant la suivante
-          const deadTime = Math.random() * 8000 + 4000;
-          setTimeout(() => spawnPlanetOffscreen(p), deadTime);
+        if (p.x > window.innerWidth + margin || p.x < -margin || p.y > window.innerHeight + margin || p.y < -margin) {
+          p.active = false; p.el.style.display = "none";
+          setTimeout(() => spawnPlanetOffscreen(p), Math.random() * 8000 + 4000);
         } else {
           p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rotation}deg)`;
         }
       });
-
       requestAnimationFrame(animatePlanets);
     }
-
     animatePlanets();
   </script>
 </body>
