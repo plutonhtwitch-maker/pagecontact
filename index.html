@@ -20,72 +20,49 @@
       --success: #22c55e;
     }
 
-    /* --- EFFET FLASH DE TRANSITION --- */
-    #warp-flash {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: white; opacity: 0; pointer-events: none; z-index: 10000;
-      transition: opacity 0.3s ease-out;
-    }
-
-    /* --- STYLES HYPER MODE (BLEU & BLANC) --- */
     body { 
       font-family: 'Plus Jakarta Sans', sans-serif; 
-      background: linear-gradient(var(--bg-overlay), var(--bg-overlay)), 
-                  url('https://i.imgur.com/Rsv7lQi.png');
+      /* Le fond de base qu'on rendra noir plus tard via une classe */
+      background-color: #05070a;
+      background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('https://i.imgur.com/Rsv7lQi.png');
       background-size: cover; background-position: center; background-attachment: fixed;
       color: var(--text-main); margin: 0; padding: 0;
       min-height: 100vh; display: flex; justify-content: center; align-items: center;
-      overflow-x: hidden;
-      transition: background-size 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+      overflow-x: hidden; transition: background-image 0s; /* Pour couper le fond d'un coup */
     }
 
-    body.hyper-mode {
-      animation: hyper-warp 0.4s linear infinite;
-      background-size: 200% 200%;
+    body.universe-destroyed {
+      background-image: none !important;
+      background-color: #000000 !important;
     }
 
-    @keyframes hyper-warp {
-      0% { background-position: 50% 50%; }
-      100% { background-position: 50% 250%; }
-    }
-
-    /* TEXTE EN DEGRADE BLEU / BLEU */
-    .hyper-mode h1 {
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #0ea5e9, #38bdf8);
-      background-size: 300%;
-      animation: blue-scroll 2s linear infinite;
-      -webkit-background-clip: text;
-    }
-
-    @keyframes blue-scroll { to { background-position: 300%; } }
-
-    .hyper-mode .logo {
-      animation: float 0.2s infinite, rotate-fast 0.4s linear infinite !important;
-      border-color: #fff;
-      box-shadow: 0 0 50px var(--accent);
-    }
-
-    @keyframes rotate-fast { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-    /* CANVAS DES ÉTINCELLES */
-    #explosion-canvas {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 999;
-    }
-
+    /* Calques en arrière-plan */
     #space-container {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       pointer-events: none; z-index: 0; overflow: hidden;
     }
-    .planet { position: absolute; will-change: transform; }
-
-    .particles {
+    
+    #dark-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 1;
-      background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
-      background-size: 50px 50px; opacity: 0.3;
+      background: #000000; opacity: 0; pointer-events: none; z-index: 1;
+      transition: opacity 2s ease;
     }
 
+    #vfx-canvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 2; /* Derrière l'interface, devant le fond */
+    }
+
+    /* Flash blanc final */
+    #flash-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: #ffffff; opacity: 0; pointer-events: none; z-index: 9999;
+      transition: opacity 0.2s ease-out;
+    }
+
+    .planet { position: absolute; will-change: transform; }
+
+    /* L'interface au premier plan (intouchable) */
     .container {
       width: 100%; max-width: 500px; padding: 40px 20px;
       text-align: center; box-sizing: border-box; position: relative; z-index: 10;
@@ -98,20 +75,15 @@
       position: relative; display: inline-block; margin-bottom: 20px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
-
+    
     .logo {
       width: 130px; height: 130px; border-radius: 50%; object-fit: cover;
       border: 3px solid var(--accent); box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
       animation: float 4s ease-in-out infinite; position: relative; z-index: 2;
-      transition: border-color 1s, box-shadow 1s, transform 0.5s;
+      transition: transform 0.1s;
     }
 
-    .logo-glow {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 140px; height: 140px; border-radius: 50%;
-      background: linear-gradient(45deg, var(--accent), var(--accent-hover));
-      filter: blur(20px); opacity: 0.5; animation: pulseGlow 3s infinite alternate; z-index: 1;
-    }
+    .logo:active { transform: scale(0.95); } /* Petit feedback au clic */
 
     h1 { 
       font-weight: 800; font-size: 2.5rem; margin: 0; letter-spacing: -1px;
@@ -144,7 +116,7 @@
     }
     .link-btn:hover .icon { transform: scale(1.2) rotate(5deg); color: var(--accent); }
     .link-btn:hover::before { left: 200%; }
-
+    
     #toast {
       visibility: hidden; min-width: 250px; background-color: var(--success); color: white;
       text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000;
@@ -158,33 +130,24 @@
     @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes pulseGlow { from { opacity: 0.4; transform: translate(-50%, -50%) scale(0.9); } to { opacity: 0.7; transform: translate(-50%, -50%) scale(1.1); } }
-    @keyframes shake-hard {
-      0% { transform: translate(0,0); }
-      25% { transform: translate(3px, -3px); }
-      50% { transform: translate(-3px, 3px); }
-      100% { transform: translate(0,0); }
-    }
-    .shaking { animation: shake-hard 0.1s linear infinite !important; }
   </style>
 </head>
 <body>
 
-  <div id="warp-flash"></div>
-  <canvas id="explosion-canvas"></canvas>
+  <div id="dark-overlay"></div>
+  <canvas id="vfx-canvas"></canvas>
   <div id="space-container"></div>
-  <div class="particles"></div>
-
+  <div id="flash-overlay"></div>
+  
   <div class="container">
     <div class="header-section">
       <div class="logo-container" onclick="handleLogoClick(event)">
-        <div class="logo-glow"></div>
         <img src="https://i.imgur.com/y8CfXfB.png" alt="PlutonH Logo" class="logo" id="main-logo">
       </div>
       <h1>PLUTONH</h1>
       <div class="bio">Streamer & Créateur de contenu</div>
     </div>
-
+    
     <div class="links-wrapper">
       <a href="https://www.twitch.tv/plutonh" class="link-btn" target="_blank" style="--i:1;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
@@ -208,118 +171,259 @@
       </div>
     </div>
   </div>
-
+  
   <div id="toast">✅ Adresse email copiée !</div>
 
   <script>
-    // --- CANVAS SUPERNOVA ---
-    const canvas = document.getElementById('explosion-canvas');
+    // --- GESTION DU CANVAS ET DES VFX ---
+    const canvas = document.getElementById('vfx-canvas');
     const ctx = canvas.getContext('2d');
-    const flash = document.getElementById('warp-flash');
-    let sparks = [];
+    const mainLogo = document.getElementById('main-logo');
+    
+    let particles = [];
+    let warpLines = [];
+    let suckedPlanets = [];
+    
     let clickCount = 0;
-    let clickTimer;
-    let isHyperMode = false;
+    let clickResetTimer;
+    let isUniverseDestroyed = false; // Bloque toute nouvelle animation si l'univers est "mort"
+    let singularityActive = false;
+    let animationId;
 
-    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    let targetX = 0, targetY = 0;
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const rect = mainLogo.getBoundingClientRect();
+      targetX = rect.left + rect.width / 2;
+      targetY = rect.top + rect.height / 2;
+    }
     window.addEventListener('resize', resize);
     resize();
 
-    class Spark {
-      constructor(x, y, color) {
-        this.x = x; this.y = y;
-        this.angle = Math.random() * Math.PI * 2;
-        this.velocity = Math.random() * (isHyperMode ? 25 : 15) + 5;
-        this.vx = Math.cos(this.angle) * this.velocity;
-        this.vy = Math.sin(this.angle) * this.velocity;
-        // CHANGEMENT : Particules blanches en hyper mode
-        this.color = color || (isHyperMode ? "#ffffff" : ['#38bdf8', '#818cf8', '#ffffff'][Math.floor(Math.random() * 3)]);
-        this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.015;
+    // 1-4 CLICS: Particules simples (mélange blanc et bleu)
+    class ShortAspirationParticle {
+      constructor() {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 80 + Math.random() * 120;
+        this.x = targetX + Math.cos(angle) * dist;
+        this.y = targetY + Math.sin(angle) * dist;
+        this.size = Math.random() * 2 + 1;
+        this.speed = 3 + Math.random() * 4; 
+        this.color = Math.random() > 0.5 ? '#ffffff' : '#38bdf8'; 
+        this.active = true;
+      }
+      update() {
+        const dx = targetX - this.x;
+        const dy = targetY - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 20) { this.active = false; return; }
+        this.x += (dx / dist) * this.speed;
+        this.y += (dy / dist) * this.speed;
       }
       draw() {
-        ctx.save(); ctx.beginPath();
+        ctx.fillStyle = this.color;
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+      }
+    }
+
+    // 5-9 CLICS (et +): Lignes de "Warp Inversé" encore ralenties
+    class WarpLine {
+      constructor(isIntense) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.max(window.innerWidth, window.innerHeight) * (0.8 + Math.random() * 0.5);
+        this.x = targetX + Math.cos(angle) * dist;
+        this.y = targetY + Math.sin(angle) * dist;
+        this.angle = Math.atan2(targetY - this.y, targetX - this.x);
+        
+        // Vitesse réduite pour un effet plus contemplatif
+        this.speed = isIntense ? (8 + Math.random() * 6) : (4 + Math.random() * 3);
+        this.length = isIntense ? (40 + Math.random() * 40) : (15 + Math.random() * 20);
+        
+        const isWhite = Math.random() > 0.5;
+        const opacity = isIntense ? '0.8' : '0.5';
+        this.color = isWhite ? `rgba(255, 255, 255, ${opacity})` : `rgba(56, 189, 248, ${opacity})`;
+        this.active = true;
+      }
+      update() {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        const dx = targetX - this.x; const dy = targetY - this.y;
+        if (Math.sqrt(dx*dx + dy*dy) < 30) this.active = false;
+      }
+      draw() {
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
         ctx.moveTo(this.x, this.y);
-        ctx.lineTo(this.x - this.vx * 2, this.y - this.vy * 2);
-        ctx.strokeStyle = this.color; ctx.lineWidth = isHyperMode ? 4 : 2;
-        ctx.globalAlpha = this.alpha; ctx.stroke(); ctx.restore();
+        ctx.lineTo(this.x - Math.cos(this.angle) * this.length, this.y - Math.sin(this.angle) * this.length);
+        ctx.stroke();
       }
-      update() { this.x += this.vx; this.y += this.vy; this.vx *= 0.95; this.vy *= 0.95; this.alpha -= this.decay; }
     }
 
+    // 10 CLICS: Planètes aspirées organiquement et encore ralenties
+    const kawaiiUrls = [
+      "https://i.imgur.com/evumoOa.png", "https://i.imgur.com/mtCNLpb.png", 
+      "https://i.imgur.com/eYdIGQl.png", "https://i.imgur.com/VBW0rG5.png", 
+      "https://i.imgur.com/Qp1ji37.png", "https://i.imgur.com/udN1aRV.png", 
+      "https://i.imgur.com/ozU4Bv1.png", "https://i.imgur.com/ZculhIg.png", 
+      "https://i.imgur.com/jNKlb8A.png"
+    ];
+
+    class SuckedPlanet {
+      constructor(url, index) {
+        this.img = new Image();
+        this.img.src = url;
+        
+        const angle = Math.random() * Math.PI * 2;
+        const diag = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2)) / 2;
+        const startDist = diag + 100 + Math.random() * 200; 
+        
+        this.x = targetX + Math.cos(angle) * startDist;
+        this.y = targetY + Math.sin(angle) * startDist;
+        this.size = 60 + Math.random() * 40;
+        this.rotation = Math.random() * 360;
+        
+        this.delay = (index * 30) + (Math.random() * 150); 
+        
+        // Multiplicateur encore plus faible pour ralentir
+        this.speedMultiplier = 0.008 + Math.random() * 0.01;
+        this.active = true;
+      }
+      update() {
+        if (this.delay > 0) { this.delay--; return; }
+        
+        const dx = targetX - this.x;
+        const dy = targetY - this.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if (dist < 20) { this.active = false; return; }
+        
+        // Vitesse max et min abaissées
+        const speed = Math.min(8, Math.max(1.5, dist * this.speedMultiplier)); 
+        
+        this.x += (dx / dist) * speed;
+        this.y += (dy / dist) * speed;
+        this.rotation += 2 + (speed * 0.4); 
+        this.size *= 0.99; 
+      }
+      draw() {
+        if (this.delay > 0 || !this.img.complete) return;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.rotation * Math.PI) / 180);
+        ctx.drawImage(this.img, -this.size/2, -this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    // MOTEUR DE RENDU
+    function renderLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let isAnimating = false;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].active) { particles[i].draw(); isAnimating = true; }
+        else particles.splice(i, 1);
+      }
+
+      for (let i = warpLines.length - 1; i >= 0; i--) {
+        warpLines[i].update();
+        if (warpLines[i].active) { warpLines[i].draw(); isAnimating = true; }
+        else warpLines.splice(i, 1);
+      }
+
+      if (!isUniverseDestroyed) {
+        if (clickCount >= 5 && clickCount < 10) {
+          if (Math.random() > 0.3) warpLines.push(new WarpLine(false));
+          isAnimating = true;
+        } else if (singularityActive) {
+          for(let i=0; i<2; i++) warpLines.push(new WarpLine(true));
+          isAnimating = true;
+        }
+      }
+
+      let activePlanets = 0;
+      for (let i = suckedPlanets.length - 1; i >= 0; i--) {
+        suckedPlanets[i].update();
+        if (suckedPlanets[i].active) { 
+          suckedPlanets[i].draw(); 
+          activePlanets++; 
+          isAnimating = true; 
+        }
+      }
+
+      if (singularityActive && activePlanets === 0 && suckedPlanets.length > 0) {
+        triggerEndFlash();
+      }
+
+      if (isAnimating) {
+        animationId = requestAnimationFrame(renderLoop);
+      } else {
+        animationId = null;
+      }
+    }
+
+    function startLoopIfNeeded() {
+      if (!animationId) {
+        resize();
+        animationId = requestAnimationFrame(renderLoop);
+      }
+    }
+
+    // GESTION DES CLICS
     function handleLogoClick(e) {
-      clickCount++;
-      clearTimeout(clickTimer);
+      if (isUniverseDestroyed || singularityActive) return;
       
-      const rect = document.getElementById('main-logo').getBoundingClientRect();
-      const x = rect.left + rect.width / 2;
-      const y = rect.top + rect.height / 2;
+      clickCount++;
+      clearTimeout(clickResetTimer);
 
-      for (let i = 0; i < (isHyperMode ? 40 : 25); i++) sparks.push(new Spark(x, y));
+      if (clickCount >= 1 && clickCount < 5) {
+        for(let i=0; i<15; i++) particles.push(new ShortAspirationParticle());
+        startLoopIfNeeded();
+      } 
+      else if (clickCount >= 5 && clickCount < 10) {
+        startLoopIfNeeded();
+      } 
+      else if (clickCount === 10) {
+        singularityActive = true;
+        document.getElementById('dark-overlay').style.opacity = '0.9';
+        
+        kawaiiUrls.forEach((url, index) => {
+          suckedPlanets.push(new SuckedPlanet(url, index));
+        });
 
-      if (clickCount >= 10 && !isHyperMode) {
-        activateHyperMode();
-      } else if (clickCount >= 5 && !isHyperMode) {
-        document.getElementById('main-logo').parentElement.classList.add('shaking');
+        startLoopIfNeeded();
       }
 
-      clickTimer = setTimeout(() => {
-        clickCount = 0;
-        document.getElementById('main-logo').parentElement.classList.remove('shaking');
-      }, 2000);
-
-      if (sparks.length > 0) requestAnimationFrame(animateSparks);
+      if (clickCount < 10) {
+        clickResetTimer = setTimeout(() => { clickCount = 0; }, 1500);
+      }
     }
 
-    function activateHyperMode() {
-      isHyperMode = true;
-      document.body.classList.add('hyper-mode');
+    function triggerEndFlash() {
+      singularityActive = false;
+      isUniverseDestroyed = true;
+      suckedPlanets = []; 
+      
+      const flash = document.getElementById('flash-overlay');
+      flash.style.opacity = '1';
+      flash.style.transition = 'opacity 0.1s ease-out';
       
       setTimeout(() => {
-        flash.style.opacity = "1";
-        setTimeout(() => {
-          isHyperMode = false;
-          document.body.classList.remove('hyper-mode');
-          clickCount = 0;
-          flash.style.opacity = "0";
-        }, 300);
-      }, 10000);
+        document.body.classList.add('universe-destroyed');
+        document.getElementById('space-container').innerHTML = ''; 
+        document.getElementById('dark-overlay').style.display = 'none';
+        
+        flash.style.transition = 'opacity 2s ease-in';
+        flash.style.opacity = '0';
+      }, 150);
     }
 
-    function animateSparks() {
-      if (sparks.length === 0 && !isHyperMode) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-      }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.globalCompositeOperation = 'lighter';
-
-      if (isHyperMode) {
-        // En hyper mode, on génère quelques étincelles blanches en continu
-        sparks.push(new Spark(Math.random() * canvas.width, Math.random() * canvas.height));
-      }
-
-      for (let i = sparks.length - 1; i >= 0; i--) {
-        sparks[i].update();
-        sparks[i].draw();
-        if (sparks[i].alpha <= 0) sparks.splice(i, 1);
-      }
-      requestAnimationFrame(animateSparks);
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById("toast");
-      toast.innerText = msg;
-      toast.className = "show";
-      setTimeout(() => toast.className = "", 3000);
-    }
-
-    function copyEmail() {
-      navigator.clipboard.writeText("plutonh@proton.me").then(() => showToast("✅ Email copié !"));
-    }
-
-    // --- SYSTEME DE PLANETES ---
-    const planetUrls = [
+    // --- SYSTEME DE PLANETES D'AMBIANCE (NORMAL) ---
+    const ambientPlanetUrls = [
       "https://i.imgur.com/evumoOa.png", "https://i.imgur.com/mtCNLpb.png", 
       "https://i.imgur.com/eYdIGQl.png", "https://i.imgur.com/VBW0rG5.png", 
       "https://i.imgur.com/Qp1ji37.png", "https://i.imgur.com/udN1aRV.png", 
@@ -328,15 +432,15 @@
     ];
 
     const container = document.getElementById("space-container");
-    const planets = [];
-    const MAX_PLANETS = 1;
-
+    const ambientPlanets = [];
+    
     function spawnPlanetOffscreen(p) {
-      p.el.src = planetUrls[Math.floor(Math.random() * planetUrls.length)];
+      if (isUniverseDestroyed || singularityActive) return; 
+      p.el.src = ambientPlanetUrls[Math.floor(Math.random() * ambientPlanetUrls.length)];
       const size = Math.floor(Math.random() * (112 - 40 + 1)) + 40; 
       p.size = size; p.el.style.width = size + "px"; p.el.style.height = size + "px";
       p.el.style.display = "block"; p.active = true;
-
+      
       const edge = Math.floor(Math.random() * 4);
       if (edge === 0) { p.x = Math.random() * window.innerWidth; p.y = -size - 20; p.dx = (Math.random() - 0.5) * 1.5; p.dy = Math.random() * 0.8 + 0.3; }
       else if (edge === 1) { p.x = window.innerWidth + size + 20; p.y = Math.random() * window.innerHeight; p.dx = -(Math.random() * 0.8 + 0.3); p.dy = (Math.random() - 0.5) * 1.5; }
@@ -345,30 +449,37 @@
       p.rotation = Math.random() * 360; p.dr = (Math.random() - 0.5) * 1.5;
     }
 
-    for (let i = 0; i < MAX_PLANETS; i++) {
-      const img = document.createElement("img");
-      img.className = "planet"; img.style.display = "none";
-      container.appendChild(img);
-      const p = { el: img, active: false };
-      planets.push(p);
-      setTimeout(() => spawnPlanetOffscreen(p), Math.random() * 4000 + 1000);
-    }
-
-    function animatePlanets() {
-      planets.forEach(p => {
+    const img = document.createElement("img");
+    img.className = "planet"; img.style.display = "none";
+    container.appendChild(img);
+    const p = { el: img, active: false };
+    ambientPlanets.push(p);
+    setTimeout(() => spawnPlanetOffscreen(p), 1000); // 1 seule à la fois comme demandé plus tôt
+    
+    function animateAmbientPlanets() {
+      ambientPlanets.forEach(p => {
         if (!p.active) return;
         p.x += p.dx; p.y += p.dy; p.rotation += p.dr;
         const margin = p.size + 100;
         if (p.x > window.innerWidth + margin || p.x < -margin || p.y > window.innerHeight + margin || p.y < -margin) {
           p.active = false; p.el.style.display = "none";
-          setTimeout(() => spawnPlanetOffscreen(p), Math.random() * 8000 + 4000);
+          setTimeout(() => spawnPlanetOffscreen(p), Math.random() * 2000 + 1000);
         } else {
           p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rotation}deg)`;
         }
       });
-      requestAnimationFrame(animatePlanets);
+      requestAnimationFrame(animateAmbientPlanets);
     }
-    animatePlanets();
+    animateAmbientPlanets();
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg; toast.className = "show";
+      setTimeout(() => toast.className = "", 3000);
+    }
+    function copyEmail() {
+      navigator.clipboard.writeText("plutonh@proton.me").then(() => showToast("✅ Email copié !"));
+    }
   </script>
 </body>
 </html>
