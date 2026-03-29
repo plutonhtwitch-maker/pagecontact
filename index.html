@@ -306,7 +306,7 @@
       });
     }
 
-    // --- SYSTEME ORGANIQUE DE PLANETES (Temps morts et max 2) ---
+    // --- SYSTEME ORGANIQUE DE PLANETES (Une seule à la fois) ---
     const planetUrls = [
       "https://i.imgur.com/evumoOa.png", "https://i.imgur.com/mtCNLpb.png", 
       "https://i.imgur.com/eYdIGQl.png", "https://i.imgur.com/VBW0rG5.png", 
@@ -317,9 +317,8 @@
 
     const container = document.getElementById("space-container");
     const planets = [];
-    const MAX_PLANETS = 2;
+    const MAX_PLANETS = 1; // Toujours seule
 
-    // Fonction pour faire naître une planète hors de l'écran avec une trajectoire traversante
     function spawnPlanetOffscreen(p) {
       p.el.src = planetUrls[Math.floor(Math.random() * planetUrls.length)];
       
@@ -330,36 +329,33 @@
       p.el.style.display = "block";
       p.active = true;
 
-      // On choisit un bord aléatoire (0: Haut, 1: Droite, 2: Bas, 3: Gauche)
       const edge = Math.floor(Math.random() * 4);
       
       if (edge === 0) { // Haut
         p.x = Math.random() * window.innerWidth;
         p.y = -size - 20;
         p.dx = (Math.random() - 0.5) * 1.5;
-        p.dy = Math.random() * 0.8 + 0.3; // Va vers le bas
+        p.dy = Math.random() * 0.8 + 0.3;
       } else if (edge === 1) { // Droite
         p.x = window.innerWidth + size + 20;
         p.y = Math.random() * window.innerHeight;
-        p.dx = -(Math.random() * 0.8 + 0.3); // Va vers la gauche
+        p.dx = -(Math.random() * 0.8 + 0.3);
         p.dy = (Math.random() - 0.5) * 1.5;
       } else if (edge === 2) { // Bas
         p.x = Math.random() * window.innerWidth;
         p.y = window.innerHeight + size + 20;
         p.dx = (Math.random() - 0.5) * 1.5;
-        p.dy = -(Math.random() * 0.8 + 0.3); // Va vers le haut
+        p.dy = -(Math.random() * 0.8 + 0.3);
       } else { // Gauche
         p.x = -size - 20;
         p.y = Math.random() * window.innerHeight;
-        p.dx = Math.random() * 0.8 + 0.3; // Va vers la droite
+        p.dx = Math.random() * 0.8 + 0.3;
         p.dy = (Math.random() - 0.5) * 1.5;
       }
-
       p.rotation = Math.random() * 360;
-      p.dr = (Math.random() - 0.5) * 1.5; // Rotation douce
+      p.dr = (Math.random() - 0.5) * 1.5;
     }
 
-    // Création des conteneurs d'images
     for (let i = 0; i < MAX_PLANETS; i++) {
       const img = document.createElement("img");
       img.className = "planet";
@@ -369,22 +365,19 @@
       const p = { el: img, active: false };
       planets.push(p);
 
-      // Désynchronisation totale : la première apparaît vite, l'autre prend son temps
-      const initialDelay = i === 0 ? Math.random() * 1000 : Math.random() * 8000 + 4000;
+      const initialDelay = Math.random() * 4000 + 1000;
       setTimeout(() => spawnPlanetOffscreen(p), initialDelay);
     }
 
-    // Boucle d'animation
     function animatePlanets() {
       planets.forEach(p => {
-        if (!p.active) return; // Si elle est en "temps mort", on l'ignore
+        if (!p.active) return;
 
         p.x += p.dx;
         p.y += p.dy;
         p.rotation += p.dr;
 
-        // On vérifie si elle est complètement sortie de l'écran avec une petite marge
-        const margin = p.size + 50;
+        const margin = p.size + 100;
         let isOutOfBounds = (
           p.x > window.innerWidth + margin || 
           p.x < -margin || 
@@ -393,15 +386,13 @@
         );
 
         if (isOutOfBounds) {
-          // La planète "meurt" et entre en temps mort
           p.active = false;
           p.el.style.display = "none";
           
-          // Temps mort aléatoire entre 3 et 10 secondes avant de renaître
-          const deadTime = Math.random() * 7000 + 3000;
+          // Délai aléatoire entre 4 et 12 secondes avant la suivante
+          const deadTime = Math.random() * 8000 + 4000;
           setTimeout(() => spawnPlanetOffscreen(p), deadTime);
         } else {
-          // On applique la position
           p.el.style.transform = `translate(${p.x}px, ${p.y}px) rotate(${p.rotation}deg)`;
         }
       });
