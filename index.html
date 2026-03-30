@@ -7,9 +7,6 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="https://i.imgur.com/R8A38PB.png">
-  
-  <!-- Vercel Web Analytics -->
-  <script defer src="/_vercel/insights/script.js"></script>
 
   <style>
     :root {
@@ -143,6 +140,18 @@
     @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    @keyframes logoBump {
+  0% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-5deg); }
+  50% { transform: scale(0.95) rotate(5deg); }
+  75% { transform: scale(1.02) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+.logo-bump {
+  animation: logoBump 0.3s ease-out;
+}
+
   </style>
 </head>
 <body>
@@ -469,10 +478,51 @@
     ambientPlanets.push(p);
     setTimeout(() => spawnPlanetOffscreen(p), 1000); 
     
+    function triggerLogoVibration() {
+      mainLogo.classList.remove('logo-bump');
+      void mainLogo.offsetWidth;
+      mainLogo.classList.add('logo-bump');
+    }
+
     function animateAmbientPlanets() {
       ambientPlanets.forEach(p => {
         if (!p.active) return;
-        p.x += p.dx; p.y += p.dy; p.rotation += p.dr;
+        
+        p.x += p.dx; 
+        p.y += p.dy; 
+        p.rotation += p.dr;
+
+        // --- DÉBUT COLLISION LOGO ---
+        if (!isUniverseDestroyed && !singularityActive) {
+          const cx = p.x + p.size / 2;
+          const cy = p.y + p.size / 2;
+          
+          const dx = cx - targetX;
+          const dy = cy - targetY;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          
+          // On calcule le rayon exact du logo dynamiquement
+          // et on multiplie par 0.85 pour ignorer les pixels transparents des PNG
+          const logoRadius = (mainLogo.offsetWidth / 2) * 0.85; 
+          const planetRadius = (p.size / 2) * 0.85; 
+          
+          if (dist < (logoRadius + planetRadius)) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            
+            const dotProduct = p.dx * nx + p.dy * ny;
+            if (dotProduct < 0) {
+              p.dx = p.dx - 2 * dotProduct * nx;
+              p.dy = p.dy - 2 * dotProduct * ny;
+              
+              p.dr = (Math.random() - 0.5) * 8;
+              
+              triggerLogoVibration();
+            }
+          }
+        }
+        // --- FIN COLLISION LOGO ---
+
         const margin = p.size + 100;
         if (p.x > window.innerWidth + margin || p.x < -margin || p.y > window.innerHeight + margin || p.y < -margin) {
           p.active = false; p.el.style.display = "none";
@@ -484,6 +534,7 @@
       requestAnimationFrame(animateAmbientPlanets);
     }
     animateAmbientPlanets();
+
 
     function showToast(msg) {
       const toast = document.getElementById("toast");
