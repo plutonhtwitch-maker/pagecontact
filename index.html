@@ -60,7 +60,6 @@
       transition: opacity 0.2s ease-out;
     }
 
-    /* MODIFICATION ICI: ajout de pointer-events et cursor */
     .planet { 
       position: absolute; 
       will-change: transform; 
@@ -72,6 +71,7 @@
     .container {
       width: 100%; max-width: 500px; padding: 40px 20px;
       text-align: center; box-sizing: border-box; position: relative; z-index: 10;
+      pointer-events: none; /* LAISSE PASSER LES CLICS AU TRAVERS DES ZONES VIDES */
     }
     
     /* HEADER & LOGO */
@@ -80,6 +80,7 @@
     .logo-container {
       position: relative; display: inline-block; margin-bottom: 20px;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
+      pointer-events: auto; /* GARDE LE LOGO CLIQUABLE */
     }
     
     .logo {
@@ -107,6 +108,7 @@
       font-size: 1.1rem; font-weight: 600; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); position: relative;
       overflow: hidden; cursor: pointer; animation: slideUp 0.6s ease backwards;
+      pointer-events: auto; /* GARDE LES BOUTONS CLIQUABLES */
     }
     .link-btn span { flex-grow: 1; text-align: center; z-index: 2; }
     .icon { width: 24px; height: 24px; fill: currentColor; z-index: 2; transition: transform 0.3s ease; }
@@ -451,20 +453,16 @@
     container.appendChild(img);
     const p = { el: img, active: false };
     
-    // MODIFICATION ICI : Événement au clic sur la planète
     img.addEventListener("click", () => {
       if (!p.active || isUniverseDestroyed || singularityActive) return;
       
-      // Nouvelle trajectoire/vitesse (le chiffre "4" la rend un peu plus rapide pour l'effet de rebond)
       p.dx = (Math.random() - 0.5) * 4;
       p.dy = (Math.random() - 0.5) * 4;
-      
-      // Nouvelle vitesse et sens de rotation
       p.dr = (Math.random() - 0.5) * 5;
     });
 
     ambientPlanets.push(p);
-    setTimeout(() => spawnPlanetOffscreen(p), 1000); // 1 seule à la fois comme demandé plus tôt
+    setTimeout(() => spawnPlanetOffscreen(p), 1000); 
     
     function animateAmbientPlanets() {
       ambientPlanets.forEach(p => {
