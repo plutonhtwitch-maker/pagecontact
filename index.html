@@ -39,6 +39,35 @@
       background-color: #000000 !important;
     }
 
+    /* Bandeau discret pour la WebView TikTok */
+    #webview-banner {
+      display: none;
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 460px;
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      text-align: center;
+      z-index: 9998;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+      pointer-events: auto;
+      box-sizing: border-box;
+      animation: fadeInDown 0.5s ease backwards;
+    }
+    #webview-banner strong {
+      color: var(--accent);
+    }
+
     /* Calques en arrière-plan */
     #space-container {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -146,6 +175,10 @@
   </style>
 </head>
 <body>
+  <div id="webview-banner">
+    💡 Depuis TikTok, si l'appli Twitch ne s'ouvre pas, appuie sur <strong>•••</strong> en haut à droite puis <strong>Ouvrir dans le navigateur</strong>.
+  </div>
+
   <div id="dark-overlay"></div>
   <canvas id="vfx-canvas"></canvas>
   <div id="space-container"></div>
@@ -161,7 +194,7 @@
     </div>
     
     <div class="links-wrapper">
-      <a href="https://www.twitch.tv/plutonh" class="link-btn" target="_blank" style="--i:1;">
+      <a href="https://www.twitch.tv/plutonh" onclick="openTwitch(event)" class="link-btn" target="_blank" style="--i:1;">
         <svg class="icon" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
         <span>Twitch</span>
       </a>
@@ -187,6 +220,37 @@
   <div id="toast">✅ Adresse email copiée !</div>
 
   <script>
+    // --- DETECTION WEBVIEW TIKTOK & DEEP LINKING TWITCH ---
+    const ua = navigator.userAgent || navigator.vendor || window.opera;
+    const isTikTokWebView = /tiktok|musical_ly|bytedance/i.test(ua);
+
+    if (isTikTokWebView) {
+      document.getElementById('webview-banner').style.display = 'block';
+    }
+
+    function openTwitch(e) {
+      const isAndroid = /android/i.test(ua);
+      const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+      const webUrl = "https://www.twitch.tv/plutonh";
+
+      if (isAndroid) {
+        e.preventDefault();
+        // Intent Android direct avec fallback vers le site web (évite le renvoi forcé sur le Play Store)
+        const intentUrl = "intent://twitch.tv/plutonh#Intent;package=tv.twitch.android.app;scheme=https;S.browser_fallback_url=" + encodeURIComponent(webUrl) + ";end";
+        window.location.href = intentUrl;
+      } else if (isIOS) {
+        e.preventDefault();
+        // Custom scheme iOS avec fallback web si l'app n'est pas installée
+        window.location.href = "twitch://stream/plutonh";
+        setTimeout(() => {
+          if (!document.hidden) {
+            window.location.href = webUrl;
+          }
+        }, 1500);
+      }
+      // Sur Desktop : comportement normal du lien (ouvre le href dans un nouvel onglet grâce à target="_blank")
+    }
+
     // --- GESTION DU CANVAS ET DES VFX ---
     const canvas = document.getElementById('vfx-canvas');
     const ctx = canvas.getContext('2d');
